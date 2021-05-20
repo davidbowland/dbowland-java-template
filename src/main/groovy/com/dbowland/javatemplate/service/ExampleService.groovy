@@ -26,12 +26,12 @@ class ExampleService {
 
   boolean updateUser(final User user) {
     log.info "Updating user ${user.name}"
-    return true
+    return isHealthy()
   }
 
   boolean deleteUser(final String id) {
     log.info "Deleting user with id ${id}"
-    return true
+    return isHealthy()
   }
 
   boolean isHealthy() {
