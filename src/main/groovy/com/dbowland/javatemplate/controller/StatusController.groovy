@@ -30,5 +30,4 @@ class StatusController {
       throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE)
     }
   }
-
 }

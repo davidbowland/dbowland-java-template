@@ -78,5 +78,4 @@ class ExampleServiceTests extends Specification {
     then:
     result
   }
-
 }

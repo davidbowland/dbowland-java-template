@@ -22,5 +22,4 @@ class User {
 
   @NotBlank(message = "Email is mandatory")
   String email
-
 }
