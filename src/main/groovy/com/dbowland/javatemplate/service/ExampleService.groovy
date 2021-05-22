@@ -1,10 +1,10 @@
 package com.dbowland.javatemplate.service
 
+import static net.logstash.logback.argument.StructuredArguments.keyValue
+
 import com.dbowland.javatemplate.domain.User
 import groovy.util.logging.Slf4j
 import org.springframework.stereotype.Service
-
-import static net.logstash.logback.argument.StructuredArguments.keyValue
 
 @Slf4j
 @Service
@@ -17,7 +17,10 @@ class ExampleService {
 
   User[] getAllUsers() {
     log.info "Gettin' all users!"
-    return [new User("Alice", "a@li.ce"), new User("Bob", "b@ob.bob")]
+    return [
+      new User("Alice", "a@li.ce"),
+      new User("Bob", "b@ob.bob")
+    ]
   }
 
   String createUser(final User user) {
@@ -39,5 +42,4 @@ class ExampleService {
   boolean isHealthy() {
     return true
   }
-
 }

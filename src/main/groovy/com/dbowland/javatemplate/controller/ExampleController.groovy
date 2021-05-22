@@ -54,5 +54,4 @@ class ExampleController {
     return ResponseEntity.status(
         exampleService.deleteUser(id) ? HttpStatus.NO_CONTENT : HttpStatus.INTERNAL_SERVER_ERROR).build()
   }
-
 }
