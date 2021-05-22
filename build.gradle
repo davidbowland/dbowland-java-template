@@ -13,6 +13,17 @@ repositories {
   mavenCentral()
 }
 
+// Create a task to copy git hooks so they will be used
+task installGitHooks(type: Copy) {
+  from '.git-hooks/'
+  into '.git/hooks/'
+}
+// Automatically execute git hook copy when test or build is executed
+gradle.projectsEvaluated {
+  test.dependsOn(installGitHooks)
+  build.dependsOn(installGitHooks)
+}
+
 dependencies {
   // Production dependencies
   // Spring Boot default
@@ -48,7 +59,7 @@ test {
 
 spotless {
   format 'misc', {
-    target '*.gradle', '*.md', '.gitignore', 'Dockerfile'
+    target '*.md', '.gitignore', 'Dockerfile', '*.sh'
     endWithNewline()
     indentWithSpaces(2)
     trimTrailingWhitespace()

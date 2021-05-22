@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Immediately exit on non-zero status
+set -e
+
+# Format code
+echo "Applying spotless formatting"
+./gradlew spotlessApply
+
+# Run tests
+echo "Running tests"
+./gradlew test

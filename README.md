@@ -46,6 +46,14 @@ Perform a production-level build with:
 ./gradlew build
 ```
 
+### Git Hooks
+
+Git hooks ensure code is tested and formatted before it is committed. They are automatically installed when you run the `test` or `build` gradle commands but can be manually installed with:
+
+```bash
+./gradlew installGitHooks
+```
+
 ## Additional Documentation
 
 * [Official Gradle documentation](https://docs.gradle.org)
