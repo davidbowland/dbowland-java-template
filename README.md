@@ -46,12 +46,26 @@ Perform a production-level build with:
 ./gradlew build
 ```
 
-### Git Hooks
+## Git Hooks
 
 Git hooks ensure code is tested and formatted before it is committed. They are automatically installed when you run the `test` or `build` gradle commands but can be manually installed with:
 
 ```bash
 ./gradlew installGitHooks
+```
+
+## Docker Container
+
+This project will be containerized and deployed to [AWS ECS](https://aws.amazon.com/ecs/). To test this locally, first install Docker:
+
+```bash
+brew cask install docker
+```
+
+Once Docker is installed, build the jar and start a container with:
+
+```bash
+./runDockerfile.sh
 ```
 
 ## Additional Documentation
