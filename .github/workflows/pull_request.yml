@@ -2,7 +2,7 @@
 name: Lint code and run tests for project
 
 on:
-  pull_request:
+  push:
     branches:
       - master
 
