@@ -14,14 +14,14 @@ repositories {
 }
 
 // Create a task to copy git hooks so they will be used
-task installGitHooks(type: Copy) {
+task installGitHooks(type: Sync) {
   from '.git-hooks/'
   into '.git/hooks/'
 }
 // Automatically execute git hook copy when test or build is executed
 gradle.projectsEvaluated {
   test.dependsOn(installGitHooks)
-  build.dependsOn(installGitHooks)
+  assemble.dependsOn(installGitHooks)
 }
 
 dependencies {
