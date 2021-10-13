@@ -17,15 +17,27 @@ class ExampleServiceTests extends Specification {
     user = new User("Evie", "e@ves.drop")
   }
 
-  def "when getUser expect a new User"() {
-    given:
-    final String id = "4"
-
+  def "when createUser then expect id back"() {
     when:
-    User result = exampleService.getUser(id)
+    String result = exampleService.createUser(user)
 
     then:
-    result != null
+    result
+  }
+
+  def "when deleteUser then expect isHealthy()"() {
+    given:
+    final String id = "2"
+
+    when:
+    Boolean result = exampleService.deleteUser(id)
+
+    then:
+    1 * exampleService.isHealthy() >> expected
+    result == expected
+
+    where:
+    expected << [true, false]
   }
 
   def "when getAllUsers expect a list of new Users"() {
@@ -36,32 +48,23 @@ class ExampleServiceTests extends Specification {
     result != null
   }
 
-  def "when createUser then expect id back"() {
+  def "when getUser expect a User"() {
+    given:
+    final String id = "4"
+
     when:
-    String result = exampleService.createUser(user)
+    Optional<User> result = exampleService.getUser(id)
 
     then:
-    result
+    result.isPresent()
   }
 
   def "when updateUser then expect isHealthy()"() {
-    when:
-    boolean result = exampleService.updateUser(user)
-
-    then:
-    1 * exampleService.isHealthy() >> expected
-    result == expected
-
-    where:
-    expected << [true, false]
-  }
-
-  def "when deleteUser then expect isHealthy()"() {
     given:
-    final String id = "2"
+    final String id = "9"
 
     when:
-    boolean result = exampleService.deleteUser(id)
+    Boolean result = exampleService.updateUser(id, user)
 
     then:
     1 * exampleService.isHealthy() >> expected
@@ -73,7 +76,7 @@ class ExampleServiceTests extends Specification {
 
   def "when isHealthy then expect true"() {
     when:
-    boolean result = exampleService.isHealthy()
+    Boolean result = exampleService.isHealthy()
 
     then:
     result

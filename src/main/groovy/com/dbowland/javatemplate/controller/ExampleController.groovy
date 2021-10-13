@@ -9,11 +9,12 @@ import org.springframework.http.ResponseEntity
 import org.springframework.util.Assert
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 import javax.validation.Valid
 
 @RestController
-@RequestMapping(value = "/v1", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/v1/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @Validated
 @Slf4j
 class ExampleController {
@@ -25,33 +26,41 @@ class ExampleController {
     this.exampleService = exampleService
   }
 
-  @GetMapping("/users/{id}")
-  @ResponseStatus(HttpStatus.OK)
-  User getSingleUser(@PathVariable("id") final String id) {
-    return exampleService.getUser(id)
-  }
-
-  @GetMapping("/users")
+  @GetMapping
   @ResponseStatus(HttpStatus.OK)
   List<User> getAllUsers() {
     return exampleService.getAllUsers()
   }
 
-  @PostMapping("/users")
-  @ResponseStatus(HttpStatus.CREATED)
-  Map<String, String> addNewUser(@Valid @RequestBody final User user) {
-    return [ id: exampleService.createUser(user) ]
+  @GetMapping("/{id}")
+  ResponseEntity<User> getSingleUser(@PathVariable("id") final String id) {
+    final Optional<User> user = exampleService.getUser(id)
+    return ResponseEntity.of(user)
   }
 
-  @PutMapping("/users")
-  ResponseEntity updateUser(@Valid @RequestBody final User user) {
-    return ResponseEntity.status(
-        exampleService.updateUser(user) ? HttpStatus.NO_CONTENT : HttpStatus.CONFLICT).build()
+  @PostMapping
+  ResponseEntity<Void> addNewUser(@Valid @RequestBody final User user) {
+    final User newUser = exampleService.createUser(user)
+    URI location = ServletUriComponentsBuilder
+        .fromCurrentRequest()
+        .path("/{id}")
+        .buildAndExpand(newUser.getId())
+        .toUri()
+    return ResponseEntity.created(location).build()
   }
 
-  @DeleteMapping("/users/{id}")
-  ResponseEntity deleteUser(@PathVariable("id") final String id) {
-    return ResponseEntity.status(
-        exampleService.deleteUser(id) ? HttpStatus.NO_CONTENT : HttpStatus.INTERNAL_SERVER_ERROR).build()
+  @PutMapping("/{id}")
+  ResponseEntity<User> updateUser(@PathVariable("id") final String id,
+                                  @Valid @RequestBody final User user) {
+    final result = exampleService.updateUser(id, user)
+    final HttpStatus httpStatus = result ? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND
+    return ResponseEntity.status(httpStatus).build()
+  }
+
+  @DeleteMapping("/{id}")
+  ResponseEntity<Void> deleteUser(@PathVariable("id") final String id) {
+    final boolean result = exampleService.deleteUser(id)
+    final HttpStatus httpStatus = result ? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND
+    return ResponseEntity.status(httpStatus).build()
   }
 }

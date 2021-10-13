@@ -10,36 +10,37 @@ import org.springframework.stereotype.Service
 @Service
 class ExampleService {
 
-  User getUser(final String id) {
-    log.info "Getting user", keyValue("id", id)
-    return new User("David", "e@ma.il")
+  User createUser(final User user) {
+    final String id = "8675309"
+    log.info "Creating user", keyValue("id", id), keyValue("name", user.name)
+    user.id = id
+    return user
+  }
+
+  Boolean deleteUser(final String id) {
+    log.info "Deleting user", keyValue("id", id)
+    return isHealthy()
   }
 
   User[] getAllUsers() {
     log.info "Gettin' all users!"
     return [
-      new User("Alice", "a@li.ce"),
-      new User("Bob", "b@ob.bob")
+        new User("Alice", "a@li.ce"),
+        new User("Bob", "b@ob.bob")
     ]
   }
 
-  String createUser(final User user) {
-    final String id = "8675309"
-    log.info "Creating user", keyValue("id", id), keyValue("name", user.name)
-    return id
+  Optional<User> getUser(final String id) {
+    log.info "Getting user", keyValue("id", id)
+    return Optional.of(new User("David", "e@ma.il"))
   }
 
-  boolean updateUser(final User user) {
-    log.info "Updating user", keyValue("id", user.id)
+  Boolean updateUser(final String id, final User user) {
+    log.info "Updating user", keyValue("id", id)
     return isHealthy()
   }
 
-  boolean deleteUser(final String id) {
-    log.info "Deleting user", keyValue("id", id)
-    return isHealthy()
-  }
-
-  boolean isHealthy() {
+  Boolean isHealthy() {
     return true
   }
 }
