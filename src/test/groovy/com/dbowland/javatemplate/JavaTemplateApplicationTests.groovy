@@ -1,8 +1,7 @@
 package com.dbowland.javatemplate
 
-import com.dbowland.javatemplate.controller.ExampleController
-import com.dbowland.javatemplate.controller.StatusController
-import com.dbowland.javatemplate.service.ExampleService
+import com.dbowland.javatemplate.controllers.ExampleController
+import com.dbowland.javatemplate.services.ExampleService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
@@ -16,13 +15,9 @@ class JavaTemplateApplicationTests extends Specification {
   @Autowired(required = false)
   private ExampleService exampleService
 
-  @Autowired(required = false)
-  private StatusController statusController
-
   def "when context is loaded expect all beans created"() {
     expect:
     exampleController
     exampleService
-    statusController
   }
 }

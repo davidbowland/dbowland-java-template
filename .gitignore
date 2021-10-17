@@ -37,3 +37,6 @@ out/
 
 ### MacOS ###
 .DS_Store
+
+### Infrastructure ###
+/node_modules/

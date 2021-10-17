@@ -1,4 +1,4 @@
-package com.dbowland.javatemplate.domain
+package com.dbowland.javatemplate.models
 
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -15,11 +15,11 @@ class User {
   }
 
   @Id
-  String id
+  Integer id
 
-  @NotBlank(message = "Name is mandatory")
+  @NotBlank(message = 'Name is mandatory')
   String name
 
-  @NotBlank(message = "Email is mandatory")
+  @NotBlank(message = 'Email is mandatory')
   String email
 }
