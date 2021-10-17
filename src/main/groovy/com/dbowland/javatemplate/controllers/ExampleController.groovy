@@ -35,24 +35,24 @@ class ExampleController {
 
   @GetMapping('/{id}')
   ResponseEntity<User> getSingleUser(@PathVariable('id') final Integer id) {
-    final Optional<User> user = exampleService.getUser(id)
-    return ResponseEntity.of(user)
+    final Optional<User> result = exampleService.getUser(id)
+    return ResponseEntity.of(result)
   }
 
   @PatchMapping(value = '/{id}', consumes = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<User> patchUser(@PathVariable('id') final Integer id,
       @Valid @RequestBody final JsonPatch jsonPatch) {
-    final Optional<User> user = exampleService.patchUser(id, jsonPatch)
-    return ResponseEntity.of(user)
+    final Optional<User> result = exampleService.patchUser(id, jsonPatch)
+    return ResponseEntity.of(result)
   }
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<Void> postNewUser(@Valid @RequestBody final User user) {
-    final User newUser = exampleService.createUser(user)
-    URI location = ServletUriComponentsBuilder
+    final User result = exampleService.createUser(user)
+    final URI location = ServletUriComponentsBuilder
         .fromCurrentRequest()
         .path('/{id}')
-        .buildAndExpand(newUser.getId())
+        .buildAndExpand(result.getId())
         .toUri()
     return ResponseEntity.created(location).build()
   }
@@ -60,15 +60,13 @@ class ExampleController {
   @PutMapping(value = '/{id}', consumes = MediaType.APPLICATION_JSON_VALUE)
   ResponseEntity<User> updateUser(@PathVariable('id') final Integer id,
       @Valid @RequestBody final User user) {
-    final result = exampleService.updateUser(id, user)
-    final HttpStatus httpStatus = result ? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND
-    return ResponseEntity.status(httpStatus).build()
+    final Optional<User> result = exampleService.updateUser(id, user)
+    return ResponseEntity.of(result)
   }
 
   @DeleteMapping('/{id}')
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   ResponseEntity<Void> deleteUser(@PathVariable('id') final Integer id) {
-    final boolean result = exampleService.deleteUser(id)
-    final HttpStatus httpStatus = result ? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND
-    return ResponseEntity.status(httpStatus).build()
+    exampleService.deleteUser(id)
   }
 }

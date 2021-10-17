@@ -1,12 +1,14 @@
 package com.dbowland.javatemplate.services
 
 import com.dbowland.javatemplate.models.User
+import com.dbowland.javatemplate.repositories.UserRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.github.fge.jsonpatch.JsonPatch
 import org.spockframework.spring.SpringSpy
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 
@@ -14,8 +16,11 @@ import spock.lang.Specification
 class ExampleServiceTests extends Specification {
   private final ObjectMapper objectMapper = new ObjectMapper()
 
-  @SpringSpy
+  @Autowired
   private ExampleService exampleService
+
+  @SpringSpy
+  private UserRepository userRepository
 
   private User user
 
@@ -23,31 +28,41 @@ class ExampleServiceTests extends Specification {
     user = new User('Evie', 'e@ves.drop')
   }
 
-  def 'when createUser then expect id back'() {
+  def 'when createUser then expect user with ID returned'() {
     when:
-    String result = exampleService.createUser(user)
+    final User result = exampleService.createUser(user)
 
     then:
-    result
+    1 * userRepository.save(user) >> { User modifiedUser ->
+      modifiedUser.id = 10
+      return modifiedUser
+    }
+    result.id
+    result.getName() == user.getName()
+    result.getEmail() == user.getEmail()
   }
 
-  def 'when deleteUser then expect true'() {
+  def 'when deleteUser then expect delete called'() {
     given:
     final Integer id = 2
 
     when:
-    Boolean result = exampleService.deleteUser(id)
+    exampleService.deleteUser(id)
 
     then:
-    result
+    1 * userRepository.deleteById(id) >> null
   }
 
   def 'when getAllUsers expect a list of new Users'() {
+    given:
+    final User user2 = new User('Michelle', 'also-testing@java.prototype')
+
     when:
     List<User> result = exampleService.getAllUsers()
 
     then:
-    result != null
+    1 * userRepository.findAll() >> [user, user2]
+    result == [user, user2]
   }
 
   def 'when getUser expect a User'() {
@@ -58,7 +73,8 @@ class ExampleServiceTests extends Specification {
     Optional<User> result = exampleService.getUser(id)
 
     then:
-    result.isPresent()
+    1 * userRepository.getById(id) >> Optional.of(user)
+    result.get() == user
   }
 
   def 'when patchUser expect a modified User'() {
@@ -78,6 +94,8 @@ class ExampleServiceTests extends Specification {
     Optional<User> result = exampleService.patchUser(id, jsonPatch)
 
     then:
+    1 * userRepository.getById(id) >> Optional.of(user)
+    1 * userRepository.save(_) >> { User modifiedUser -> modifiedUser }
     result.get().name == expectedUser.name
   }
 
@@ -86,9 +104,11 @@ class ExampleServiceTests extends Specification {
     final Integer id = 9
 
     when:
-    Boolean result = exampleService.updateUser(id, user)
+    Optional<User> result = exampleService.updateUser(id, user)
 
     then:
-    result
+    1 * userRepository.getById(id) >> Optional.of(user)
+    1 * userRepository.save(_) >> { User modifiedUser -> modifiedUser }
+    result.get() == user
   }
 }

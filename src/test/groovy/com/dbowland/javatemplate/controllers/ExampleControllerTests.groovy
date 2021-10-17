@@ -58,7 +58,7 @@ class ExampleControllerTests extends Specification {
 
   // Delete user
 
-  def 'when DELETE request to /v1/users/{id} expect no content status on success'() {
+  def 'when DELETE request to /v1/users/{id} expect no content status'() {
     given:
     final Integer id = 8
 
@@ -67,21 +67,8 @@ class ExampleControllerTests extends Specification {
         .andDo(MockMvcResultHandlers.print())
 
     then:
-    1 * exampleService.deleteUser(id) >> true
+    1 * exampleService.deleteUser(id)
     result.andExpect(status().isNoContent())
-  }
-
-  def 'when DELETE request to /v1/users/{id} expect not found status on failure'() {
-    given:
-    final Integer id = 1
-
-    when:
-    def result = mvc.perform(delete("/v1/users/${id}"))
-        .andDo(MockMvcResultHandlers.print())
-
-    then:
-    1 * exampleService.deleteUser(_) >> false
-    result.andExpect(status().isNotFound())
   }
 
   // Get one user
@@ -219,7 +206,8 @@ class ExampleControllerTests extends Specification {
       assert passedId == id
       return Optional.of(newUser)
     }
-    result.andExpect(status().isNoContent())
+    result.andExpect(status().isOk())
+    result.andExpect(content().json(objectMapper.writeValueAsString(user)))
   }
 
   def 'when PUT request to /v1/users/{id} expect not found status on failure'() {

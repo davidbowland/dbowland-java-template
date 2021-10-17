@@ -7,12 +7,9 @@ import javax.validation.constraints.NotBlank
 @Entity
 class User {
 
-  User() {
-    this.id = Math.random() * 100
-  }
+  User() { }
 
   User(final String name, final String email) {
-    this.id = Math.random() * 100
     this.name = name
     this.email = email
   }

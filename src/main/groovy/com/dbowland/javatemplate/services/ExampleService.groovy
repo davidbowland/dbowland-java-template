@@ -24,39 +24,41 @@ class ExampleService {
   }
 
   User createUser(final User user) {
-    log.info 'Creating user', keyValue('id', user.id), keyValue('name', user.name)
-    return user
+    log.info 'Creating user', keyValue('name', user.name)
+    return userRepository.save(user)
   }
 
-  Boolean deleteUser(final Integer id) {
+  void deleteUser(final Integer id) {
     log.info 'Deleting user', keyValue('id', id)
-    return true
+    userRepository.deleteById(id)
   }
 
-  User[] getAllUsers() {
-    log.info "Gettin' all users!"
-    return [
-      new User('Alice', 'a@li.ce'),
-      new User('Bob', 'b@ob.bob')
-    ]
+  List<User> getAllUsers() {
+    log.info 'Getting all users'
+    return userRepository.findAll()
   }
 
   Optional<User> getUser(final Integer id) {
     log.info 'Getting user', keyValue('id', id)
-    return Optional.of(new User('David', 'e@ma.il'))
+    return userRepository.getById(id)
   }
 
   Optional<User> patchUser(final Integer id, final JsonPatch jsonPatch) {
     log.info 'Patching user', keyValue('id', id), keyValue('jsonPatch', jsonPatch)
-    final Optional<User> modifiedUser = getUser(id).map({ User user ->
+    return getUser(id).map({ User user ->
       final JsonNode jsonNode = jsonPatch.apply(objectMapper.convertValue(user, JsonNode.class))
-      return objectMapper.treeToValue(jsonNode, User.class)
+      final User modifiedUser = objectMapper.treeToValue(jsonNode, User.class)
+      return userRepository.save(modifiedUser)
     })
-    return modifiedUser
   }
 
-  Boolean updateUser(final Integer id, final User user) {
+  Optional<User> updateUser(final Integer id, final User user) {
     log.info 'Updating user', keyValue('id', id)
-    return true
+    return getUser(id)
+        .map({ User modifiedUser ->
+          modifiedUser.setName(user.getName())
+          modifiedUser.setEmail(user.getEmail())
+          return userRepository.save(modifiedUser)
+        })
   }
 }
