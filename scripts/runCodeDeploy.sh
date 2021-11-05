@@ -5,6 +5,7 @@
 # Stop immediately on error
 set -e
 
+# Log in and set environment variables, if necessary
 if [[ -z "$1" ]]; then
   $(./infrastructure/scripts/assumeDeveloperRole.sh)
 
@@ -18,7 +19,7 @@ DEPLOYMENT_ID=$(aws deploy create-deployment --application-name "$SERVICE_NAME" 
     --deployment-group-name "$SERVICE_NAME" \
     --revision revisionType=S3,s3Location="$APPSPEC_S3_LOCATION" \
     | jq .deploymentId -r)
-echo "[$(date +%s)] Created deployment $DEPLOYMENT_ID"
+echo "[$(date -u)] Created deployment $DEPLOYMENT_ID"
 
 # Wait for deploy to exit in progress status, then display output
 
@@ -27,11 +28,11 @@ DEPLOYMENT_STATUS="Pending"
 while [[ "$DEPLOYMENT_STATUS" == "Pending" ]] || [[ "$DEPLOYMENT_STATUS" == "InProgress" ]]; do
   sleep 3
   DEPLOYMENT_STATUS=$(aws deploy get-deployment --deployment-id "$DEPLOYMENT_ID" | jq .deploymentInfo.status -r)
-  echo "[$(date +%s)] Deployment status: $DEPLOYMENT_STATUS"
+  echo "[$(date -u)] Deployment status: $DEPLOYMENT_STATUS"
 done
 
 if [[ "$DEPLOYMENT_STATUS" == "Failed" ]]; then
   ERROR_DETAILS=$(aws deploy get-deployment --deployment-id "$DEPLOYMENT_ID" | jq .deploymentInfo.errorInformation -r)
-  echo "[$(date +%s)] Error information: $ERROR_DETAILS"
+  echo "[$(date -u)] Error information: $ERROR_DETAILS"
   exit 1
 fi

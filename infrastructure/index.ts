@@ -1,4 +1,3 @@
-// import './api-gateway/index'
 import './cloudwatch/index'
 import './codedeploy'
 import './ec2/index'
@@ -10,5 +9,7 @@ import './lb/index'
 // Output
 
 import { ecsService } from './ecs/services'
+import { loadBalancer } from './lb/load-balancers'
 
+export const loadBalancerDnsName = loadBalancer.loadBalancer.dnsName
 export const taskDefinitionArn = ecsService.taskDefinition.taskDefinition.arn
