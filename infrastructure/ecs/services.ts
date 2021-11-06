@@ -16,7 +16,6 @@ import {
 // https://www.pulumi.com/docs/reference/pkg/nodejs/pulumi/awsx/ecs/#services
 
 // The following *resource* name -- not service name -- determines Task Definition name
-// export const ecsService = new awsx.ecs.EC2Service(`${appName}-service`, {
 export const ecsService = new awsx.ecs.FargateService(`${appName}-service`, {
   cluster: ecsCluster,
   deploymentController: {
