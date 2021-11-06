@@ -14,14 +14,14 @@ repositories {
 }
 
 // Create a task to copy git hooks so they will be used
-task installGitHooks(type: Copy) {
+task installGitHooks(type: Sync) {
   from '.git-hooks/'
   into '.git/hooks/'
 }
 // Automatically execute git hook copy when test or build is executed
 gradle.projectsEvaluated {
   test.dependsOn(installGitHooks)
-  build.dependsOn(installGitHooks)
+  assemble.dependsOn(installGitHooks)
 }
 
 dependencies {
@@ -30,6 +30,8 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter'
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.codehaus.groovy:groovy'
+  // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-json
+  implementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.0.1'
 
   // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.5.5'
