@@ -1,5 +1,5 @@
 import './cloudwatch/index'
-import './codedeploy'
+import './codedeploy/index'
 import './ec2/index'
 import './ecr/index'
 import './ecs/index'

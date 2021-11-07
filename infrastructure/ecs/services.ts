@@ -22,7 +22,7 @@ export const ecsService = new awsx.ecs.FargateService(`${appName}-service`, {
     type: 'CODE_DEPLOY',
   },
   deploymentMaximumPercent: 200,
-  deploymentMinimumHealthyPercent: 0,
+  deploymentMinimumHealthyPercent: 100,
   desiredCount: 1,
   enableEcsManagedTags: false,
   name: `${appName}-service`,
