@@ -1,10 +1,11 @@
-import './cloudwatch/index'
-import './codedeploy/index'
-import './ec2/index'
-import './ecr/index'
-import './ecs/index'
-import './iam/index'
-import './lb/index'
+import './api-gateway'
+import './cloudwatch'
+import './codedeploy'
+import './ec2'
+import './ecr'
+import './ecs'
+import './iam'
+import './lb'
 
 // Output
 
