@@ -7,12 +7,6 @@ import { appName, createdBy, createdFor } from '../vars'
 
 export const ecsCluster = new awsx.ecs.Cluster('cluster', {
   name: appName,
-  settings: [
-    {
-      name: 'containerInsights',
-      value: 'enabled',
-    },
-  ],
   tags: {
     createdBy,
     createdFor,
