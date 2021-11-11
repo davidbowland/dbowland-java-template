@@ -1,5 +1,5 @@
 import { loadBalancer } from './load-balancers'
-import { appName, createdBy, createdFor } from '../vars'
+import { appName, createdBy, createdFor } from '@vars'
 
 // https://www.pulumi.com/docs/reference/pkg/nodejs/pulumi/awsx/lb/#TargetGroup
 

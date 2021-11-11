@@ -1,6 +1,6 @@
 import * as aws from '@pulumi/aws'
 
-import { appName, createdBy, createdFor } from '../vars'
+import { appName, createdBy, createdFor } from '@vars'
 
 // https://www.pulumi.com/registry/packages/aws/api-docs/codedeploy/application/
 

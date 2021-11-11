@@ -1,7 +1,7 @@
 import * as aws from '@pulumi/aws'
 import * as awsx from '@pulumi/awsx'
 
-import { vpcId } from '../vars'
+import { vpcId } from '@vars'
 
 // https://www.pulumi.com/docs/reference/pkg/aws/ec2/vpc/
 // https://www.pulumi.com/docs/reference/pkg/nodejs/pulumi/awsx/ec2/
