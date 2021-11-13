@@ -1,1 +1,1 @@
-import './vpcs'
+export * from './vpcs'

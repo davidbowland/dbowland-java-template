@@ -16,8 +16,7 @@ export const createdFor = 'example-project'
 export const cognitoUserPoolArn = `arn:aws:cognito-idp:us-east-2:${awsAccountId}:userpool/us-east-2_JLHXqBLCP`
 
 export const resourcePlain = '/users'
-export const resourceById = `${resourcePlain}/{userId}`
-export const resourceRandom = `${resourcePlain}/random`
+export const resourceById = `${resourcePlain}/{proxy+}`
 
 /* ECS */
 

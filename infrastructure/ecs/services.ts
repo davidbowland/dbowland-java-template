@@ -1,7 +1,7 @@
 import * as awsx from '@pulumi/awsx'
 
 import { ecsCluster } from './clusters'
-import { applicationListener } from '@lb/listeners'
+import { applicationListener } from '@lb'
 import {
   appName,
   awsAccountId,

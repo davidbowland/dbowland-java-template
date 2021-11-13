@@ -1,1 +1,1 @@
-import './log-groups'
+export * from './log-groups'

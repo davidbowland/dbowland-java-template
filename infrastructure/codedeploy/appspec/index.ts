@@ -1,6 +1,6 @@
 import { writeFileSync } from 'fs'
 
-import { ecsService } from '@ecs/services'
+import { ecsService } from '@ecs'
 import { appName, publicSubnetId1, publicSubnetId2, securityGroupId } from '@vars'
 
 ecsService.taskDefinition.taskDefinition.arn.apply((taskDefinitionArn) =>

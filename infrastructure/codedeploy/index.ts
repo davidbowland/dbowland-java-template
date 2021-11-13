@@ -1,3 +1,4 @@
-import './appspec/index'
-import './applications'
-import './deployment-groups'
+import './appspec'
+
+export * from './applications'
+export * from './deployment-groups'
