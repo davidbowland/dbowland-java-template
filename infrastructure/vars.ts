@@ -11,6 +11,14 @@ export const awsRegion = 'us-east-2'
 export const createdBy = appName
 export const createdFor = 'example-project'
 
+/* API Gateway */
+
+export const cognitoAppClientId = '20qc4slu4pbciub20544gesu6b'
+export const cognitoUserPoolEndpoint = 'https://cognito-idp.us-east-2.amazonaws.com/us-east-2_JLHXqBLCP'
+
+export const resourcePlain = '/users'
+export const resourceById = `${resourcePlain}/{proxy+}`
+
 /* ECS */
 
 export const ecsDeployBucket = 'jokes-ecs-deploy'

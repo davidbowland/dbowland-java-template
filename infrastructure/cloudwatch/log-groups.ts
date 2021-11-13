@@ -1,6 +1,6 @@
 import * as aws from '@pulumi/aws'
 
-import { createdBy, createdFor, ecsLogGroupName } from '../vars'
+import { createdBy, createdFor, ecsLogGroupName } from '@vars'
 
 // https://www.pulumi.com/docs/reference/pkg/aws/cloudwatch/loggroup/
 

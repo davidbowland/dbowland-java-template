@@ -1,8 +1,8 @@
 import * as aws from '@pulumi/aws'
 
-import { codeDeployServiceRole } from '../iam/roles'
-import { applicationListener } from '../lb/listeners'
-import { appName, createdBy, createdFor } from '../vars'
+import { codeDeployServiceRole } from '@iam'
+import { applicationListener } from '@lb'
+import { appName, createdBy, createdFor } from '@vars'
 
 // https://www.pulumi.com/registry/packages/aws/api-docs/codedeploy/deploymentgroup/
 

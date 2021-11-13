@@ -1,1 +1,1 @@
-import './repositories'
+export * from './repositories'

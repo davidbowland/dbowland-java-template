@@ -1,7 +1,7 @@
 import * as awsx from '@pulumi/awsx'
 
 import { ecsCluster } from './clusters'
-import { applicationListener } from '../lb/listeners'
+import { applicationListener } from '@lb'
 import {
   appName,
   awsAccountId,
@@ -11,7 +11,7 @@ import {
   ecsLogGroupName,
   publicSubnetId1,
   publicSubnetId2,
-} from '../vars'
+} from '@vars'
 
 // https://www.pulumi.com/docs/reference/pkg/nodejs/pulumi/awsx/ecs/#services
 
@@ -22,7 +22,7 @@ export const ecsService = new awsx.ecs.FargateService(`${appName}-service`, {
     type: 'CODE_DEPLOY',
   },
   deploymentMaximumPercent: 200,
-  deploymentMinimumHealthyPercent: 0,
+  deploymentMinimumHealthyPercent: 100,
   desiredCount: 1,
   enableEcsManagedTags: false,
   name: `${appName}-service`,
