@@ -13,7 +13,8 @@ export const createdFor = 'example-project'
 
 /* API Gateway */
 
-export const cognitoUserPoolArn = `arn:aws:cognito-idp:us-east-2:${awsAccountId}:userpool/us-east-2_JLHXqBLCP`
+export const cognitoAppClientId = '20qc4slu4pbciub20544gesu6b'
+export const cognitoUserPoolEndpoint = 'https://cognito-idp.us-east-2.amazonaws.com/us-east-2_JLHXqBLCP'
 
 export const resourcePlain = '/users'
 export const resourceById = `${resourcePlain}/{proxy+}`
