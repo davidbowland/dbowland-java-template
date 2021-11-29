@@ -7,11 +7,15 @@ import '@cloudwatch'
 import '@codedeploy'
 import '@ec2'
 import '@ecr'
-import { ecsService } from '@ecs'
+import '@ecs'
 import '@iam'
-import { loadBalancer } from '@lb'
+import '@lb'
+import '@route53'
 
 // Output
+
+import { ecsService } from '@ecs'
+import { loadBalancer } from '@lb'
 
 export const loadBalancerDnsName = loadBalancer.loadBalancer.dnsName
 export const taskDefinitionArn = ecsService.taskDefinition.taskDefinition.arn

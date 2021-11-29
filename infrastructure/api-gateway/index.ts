@@ -1,5 +1,7 @@
+export * from './api-mappings'
 export * from './apis'
 export * from './authorizers'
+export * from './domain-names'
 export * from './integrations'
 export * from './routes'
 export * from './stages'
