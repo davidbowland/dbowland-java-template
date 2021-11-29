@@ -30,8 +30,6 @@ export const ecsService = new awsx.ecs.FargateService(`${appName}-service`, {
   taskDefinitionArgs: {
     containers: {
       [`${appName}-container`]: {
-        cpu: 1,
-        memory: 2048,
         image: `${awsAccountId}.dkr.ecr.${awsRegion}.amazonaws.com/${appName}:latest`,
         portMappings: [applicationListener],
         logConfiguration: {
