@@ -1,6 +1,6 @@
-# dbowland.com Java Template
+# Java Template
 
-Starter template for Java projects for dbowland.com
+Starter template for Java/Groovy projects
 
 (Either Java or Groovy can be used)
 

@@ -1,7 +1,7 @@
 {
-  "name": "infrastructure",
+  "name": "java-template-infrastructure",
   "version": "1.0.0",
-  "description": "Infrastructure for ECS deployment",
+  "description": "Infrastructure for ECS deployment of java-template",
   "author": "David Bowland",
   "engines": {
     "node": "^16.0.0"
