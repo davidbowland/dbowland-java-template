@@ -6,13 +6,15 @@
 set -e
 
 # Log in and set environment variables, if necessary
+BUCKET=dbowland-ecs
 if [[ -z "$1" ]]; then
-  $(./infrastructure/scripts/assumeDeveloperRole.sh)
+  $(./scripts/assumeDeveloperRole.sh)
 
+  BUCKET=dbowland-ecs-test
   SERVICE_NAME=${PWD##*/}
 fi
 
-APPSPEC_S3_LOCATION="{bucket=jokes-ecs-deploy,key="$SERVICE_NAME/AppSpec.json",bundleType=JSON}"
+APPSPEC_S3_LOCATION="{bucket=$BUCKET,key="$SERVICE_NAME/AppSpec.json",bundleType=JSON}"
 
 # Create a new deployment and remember the ID
 DEPLOYMENT_ID=$(aws deploy create-deployment --application-name "$SERVICE_NAME" \
