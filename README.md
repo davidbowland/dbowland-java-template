@@ -72,36 +72,16 @@ Once Docker is installed, build the jar and start a container with:
 
 In emergency situations, containers can be copied directly to [AWS ECR](https://aws.amazon.com/ecr/).
 
-Login to ECR:
-
 ```bash
-aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com
+./scripts/uploadToEcr.sh
 ```
 
-Build the `Dockerfile` and tag it:
+## Infrastructure
+
+Push your code or execute the `./scripts/deployInfrastructure.sh` script to deploy the infrastructure to development. This project automatically deploys to production when a merge to `master` is made via a pull request.
 
 ```bash
-docker build . -t $AWS_ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com/${PWD##*/}:latest --platform linux/amd64
-```
-
-Push the image:
-
-```bash
-docker push $AWS_ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com/${PWD##*/}:latest
-```
-
-## Infrastructure / Deploying to AWS
-
-The infrastructure for this project is maintained as code as part of the project in the `infrastructure` folder. New Docker images are copied to [AWS ECS](https://aws.amazon.com/ecs/) by redeploying this infrastructure. [Pulumi CLI](https://www.pulumi.com/docs/reference/cli/) and [Node 16](https://nodejs.org/en/) are required for local deployments, which are discouraged. [Node 16](https://nodejs.org/en/) should be installed with [NVM](https://github.com/nvm-sh/nvm) and [Pulumi CLI](https://www.pulumi.com/docs/reference/cli/) can be installed with:
-
-```bash
-brew install pulumi
-```
-
-From the `infrastructure` folder, deploy the infrastructure with:
-
-```bash
-npm run deploy
+./scripts/deployInfrastructure.sh
 ```
 
 ## Additional Documentation

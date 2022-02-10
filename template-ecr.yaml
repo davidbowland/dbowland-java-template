@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  emails-queue-service
+
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  AccountId:
+    Type: String
+    Description: AWS account ID
+  Environment:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - prod
+      - test
+    Description: Environment for deploy
+
+Mappings:
+  EnvironmentMap:
+    prod:
+      project: java-template
+    test:
+      project: java-template-test
+
+Resources:
+  ImageRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      EncryptionConfiguration:
+        EncryptionType: AES256
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      ImageTagMutability: MUTABLE
+      RepositoryName: !Sub
+        - 'dbowland/${Project}'
+        - Project: !FindInMap [EnvironmentMap, !Ref Environment, project]
+      Tags:
+        - Key: 'created-by'
+          Value: 'java-template'
+        - Key: 'created-for'
+          Value: 'dbowland'

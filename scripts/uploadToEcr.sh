@@ -14,7 +14,7 @@ if [[ -z "$1" ]]; then
   # Login to ECR
   aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin "$ECR_REGISTRY"
 
-  SERVICE_NAME="${PWD##*/}"
+  SERVICE_NAME="dbowland/${PWD##*/}-test"
 fi
 
 # Generate image tag from git branch and sha1 hash
@@ -23,11 +23,11 @@ COMMIT_HASH=$(git rev-parse HEAD)
 IMAGE_TAG=$BRANCH_NAME-$COMMIT_HASH
 
 # Build the Dockerfile and tag it
-docker build . -t "$ECR_REGISTRY/$SERVICE_NAME:$IMAGE_TAG" --platform linux/amd64
+docker build . -t "$ECR_REGISTRY/$SERVICE_NAME:latest" --platform linux/amd64
 
 # Push the image
-docker push "$ECR_REGISTRY/$SERVICE_NAME:$IMAGE_TAG"
-
-# Re-tag the image as "latest" then re-push
-docker tag "$ECR_REGISTRY/$SERVICE_NAME:$IMAGE_TAG" "$ECR_REGISTRY/$SERVICE_NAME:latest"
 docker push "$ECR_REGISTRY/$SERVICE_NAME:latest"
+
+# Re-tag the image with a hash tag, then re-push
+#docker tag "$ECR_REGISTRY/$SERVICE_NAME:latest" "$ECR_REGISTRY/$SERVICE_NAME:$IMAGE_TAG"
+#docker push "$ECR_REGISTRY/$SERVICE_NAME:$IMAGE_TAG"

@@ -1,0 +1,298 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  java-template
+
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  AccountId:
+    Type: String
+    Description: AWS account ID
+  Environment:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - prod
+      - test
+    Description: Environment for deploy
+  Region:
+    Type: String
+    Default: us-east-2
+    AllowedValues:
+      - us-east-1
+      - us-east-2
+    Description: Region for deploy
+  ContainerPort:
+    Type: Number
+    Default: 80
+  LoadBalancerPort:
+    Type: Number
+    Default: 443
+  MinContainers:
+    Type: Number
+    Default: 1
+  MaxContainers:
+    Type: Number
+    Default: 3
+  AutoScalingTargetValue:
+    Type: Number
+    Default: 75
+
+Mappings:
+  EnvironmentMap:
+    prod:
+      certificate: 5d4db894-c9fc-42ca-8f80-3c5da6c1678e
+      domain: java-template.dbowland.com
+      project: java-template
+      securityGroupHttp: sg-08f88449c82dde4ac
+      securityGroupHttps: sg-00406c1b125fd4c55
+      subnet1: subnet-02e7d088ff1f47bac
+      subnet2: subnet-0d29c5f5a6bde16ad
+      vpcId: vpc-035b4ad418ea15f8b
+      zoneId: Z072422417XWM8PIXXSFA
+    test:
+      certificate: 14a32175-0c26-4768-b71f-3fa611b8f5a2
+      domain: java-template.bowland.link
+      project: java-template-test
+      securityGroupHttp: sg-011ddcd30dced88f3
+      securityGroupHttps: sg-09877169390ae3cc2
+      subnet1: subnet-0a8968a14bdc0dfb8
+      subnet2: subnet-031d651d972860c51
+      vpcId: vpc-083ca80494f3beafe
+      zoneId: Z01312547RGU1BYKIJXY
+Resources:
+  # ECS
+
+  EcsCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      CapacityProviders:
+        - FARGATE
+      ClusterName: !FindInMap [EnvironmentMap, !Ref Environment, project]
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+      Tags:
+        - Key: 'created-by'
+          Value: 'java-template'
+        - Key: 'created-for'
+          Value: 'dbowland'
+
+  EcsService:
+    Type: AWS::ECS::Service
+    DependsOn: [Listener]
+    Properties:
+      Cluster: !Ref EcsCluster
+      DeploymentController:
+        Type: CODE_DEPLOY
+      DesiredCount: 1
+      EnableECSManagedTags: false
+      HealthCheckGracePeriodSeconds: 60
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: !FindInMap [EnvironmentMap, !Ref Environment, project]
+          ContainerPort: !Ref ContainerPort
+          TargetGroupArn: !Ref TargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !FindInMap [EnvironmentMap, !Ref Environment, securityGroupHttp]
+          Subnets:
+            - !FindInMap [EnvironmentMap, !Ref Environment, subnet1]
+            - !FindInMap [EnvironmentMap, !Ref Environment, subnet2]
+      ServiceName: !FindInMap [EnvironmentMap, !Ref Environment, project]
+      Tags:
+        - Key: 'created-by'
+          Value: 'java-template'
+        - Key: 'created-for'
+          Value: 'dbowland'
+      TaskDefinition: !Ref EcsTaskDefinition
+
+  EcsTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: ClusterLogGroup
+    Properties:
+      ContainerDefinitions:
+        - Image: !Sub
+            - '${AccountId}.dkr.ecr.us-east-2.amazonaws.com/dbowland/${Project}:latest'
+            - Project: !FindInMap [EnvironmentMap, !Ref Environment, project]
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              'awslogs-group': !Ref ClusterLogGroup
+              'awslogs-region': !Ref Region
+              'awslogs-stream-prefix': ecs
+          Name: !FindInMap [EnvironmentMap, !Ref Environment, project]
+          PortMappings:
+            - ContainerPort: !Ref ContainerPort
+      Cpu: 256
+      ExecutionRoleArn: !Ref ExecutionRole
+      Family: !FindInMap [EnvironmentMap, !Ref Environment, project]
+      Memory: 0.5GB
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Tags:
+        - Key: 'created-by'
+          Value: 'java-template'
+        - Key: 'created-for'
+          Value: 'dbowland'
+      TaskRoleArn: !Ref TaskRole
+
+  # Auto Scaling
+
+  AutoScalingTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MinCapacity: !Ref MinContainers
+      MaxCapacity: !Ref MaxContainers
+      ResourceId: !Join ['/', [service, !Ref EcsCluster, !GetAtt EcsService.Name]]
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+      RoleARN: !GetAtt AutoScalingRole.Arn
+
+  AutoScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub
+        - '${Project}-auto-scaling-policy'
+        - Project: !FindInMap [EnvironmentMap, !Ref Environment, project]
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref AutoScalingTarget
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+        ScaleInCooldown: 10
+        ScaleOutCooldown: 10
+        TargetValue: !Ref AutoScalingTargetValue
+
+  # Load Balancer
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !FindInMap [EnvironmentMap, !Ref Environment, project]
+      Scheme: internet-facing
+      SecurityGroups:
+        - !FindInMap [EnvironmentMap, !Ref Environment, securityGroupHttps]
+      Subnets:
+        - !FindInMap [EnvironmentMap, !Ref Environment, subnet1]
+        - !FindInMap [EnvironmentMap, !Ref Environment, subnet2]
+      Tags:
+        - Key: 'created-by'
+          Value: 'java-template'
+        - Key: 'created-for'
+          Value: 'dbowland'
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: [LoadBalancer]
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: '/actuator/health'
+      Port: !Ref ContainerPort
+      Protocol: HTTP
+      Tags:
+        - Key: 'created-by'
+          Value: 'java-template'
+        - Key: 'created-for'
+          Value: 'dbowland'
+      TargetType: ip
+      VpcId: !FindInMap [EnvironmentMap, !Ref Environment, vpcId]
+
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn: [TargetGroup]
+    Properties:
+      Certificates:
+        - CertificateArn: !Sub
+            - 'arn:aws:acm:${Region}:${AccountId}:certificate/${Certificate}'
+            - Certificate: !FindInMap [ EnvironmentMap, !Ref Environment, certificate ]
+      DefaultActions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+
+  # IAM
+
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub
+        - '${Project}-execution-role'
+        - Project: !FindInMap [EnvironmentMap, !Ref Environment, project]
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub
+        - '${Project}-task-role'
+        - Project: !FindInMap [EnvironmentMap, !Ref Environment, project]
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+
+  AutoScalingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub
+        - '${Project}-auto-scaling-role'
+        - Project: !FindInMap [EnvironmentMap, !Ref Environment, project]
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole'
+
+  # CloudWatch
+
+  ClusterLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub
+        - '/aws/ecs/${Project}'
+        - Project: !FindInMap [EnvironmentMap, !Ref Environment, project]
+      RetentionInDays: 30
+
+  ErrorMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    DependsOn: [ClusterLogGroup]
+    Properties:
+      FilterPattern: '[timestamp, uuid, level="ERROR", message]'
+      LogGroupName: !Sub
+        - '/aws/ecs/${Project}'
+        - Project: !FindInMap [EnvironmentMap, !Ref Environment, project]
+      MetricTransformations:
+        - MetricValue: '1'
+          MetricNamespace: dbowland
+          MetricName: ErrorCount
+
+  # Route 53
+
+  DNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !FindInMap [EnvironmentMap, !Ref Environment, zoneId]
+      Name: !FindInMap [EnvironmentMap, !Ref Environment, domain]
+      Type: A
+      AliasTarget:
+        DNSName: !Sub '${LoadBalancer.DNSName}'
+        HostedZoneId: !Sub '${LoadBalancer.CanonicalHostedZoneID}'
