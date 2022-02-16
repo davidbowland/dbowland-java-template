@@ -85,7 +85,7 @@ Resources:
     Properties:
       Cluster: !Ref EcsCluster
       DeploymentController:
-        Type: CODE_DEPLOY
+        Type: ECS
       DesiredCount: 1
       EnableECSManagedTags: false
       HealthCheckGracePeriodSeconds: 60
