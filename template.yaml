@@ -25,7 +25,7 @@ Parameters:
     Description: Region for deploy
   ContainerPort:
     Type: Number
-    Default: 80
+    Default: 8000
   LoadBalancerPort:
     Type: Number
     Default: 443
@@ -45,7 +45,7 @@ Mappings:
       certificate: 5d4db894-c9fc-42ca-8f80-3c5da6c1678e
       domain: java-template.dbowland.com
       project: java-template
-      securityGroupHttp: sg-08f88449c82dde4ac
+      securityGroupContainer: sg-0e88abc4c682068c6
       securityGroupHttps: sg-00406c1b125fd4c55
       subnet1: subnet-02e7d088ff1f47bac
       subnet2: subnet-0d29c5f5a6bde16ad
@@ -55,12 +55,13 @@ Mappings:
       certificate: 14a32175-0c26-4768-b71f-3fa611b8f5a2
       domain: java-template.bowland.link
       project: java-template-test
-      securityGroupHttp: sg-011ddcd30dced88f3
+      securityGroupContainer: sg-04a70084c0a15ffe6
       securityGroupHttps: sg-09877169390ae3cc2
       subnet1: subnet-0a8968a14bdc0dfb8
       subnet2: subnet-031d651d972860c51
       vpcId: vpc-083ca80494f3beafe
       zoneId: Z01312547RGU1BYKIJXY
+
 Resources:
   # ECS
 
@@ -98,7 +99,7 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
-            - !FindInMap [EnvironmentMap, !Ref Environment, securityGroupHttp]
+            - !FindInMap [EnvironmentMap, !Ref Environment, securityGroupContainer]
           Subnets:
             - !FindInMap [EnvironmentMap, !Ref Environment, subnet1]
             - !FindInMap [EnvironmentMap, !Ref Environment, subnet2]
