@@ -17,4 +17,4 @@ docker build . -t "$SERVICE_NAME"
 
 # Run image built from port 80, mapped to port 80 of the service
 # Add -e for environment variables
-docker run -dp 80:80 "$SERVICE_NAME"
+docker run -dp 8000:8000 "$SERVICE_NAME"

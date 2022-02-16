@@ -1,5 +1,5 @@
-# Start with Java 11, using the slimmest version
-FROM openjdk:11-jre-slim
+# Start with Java 11
+FROM bellsoft/liberica-openjdk-alpine:11
 
 # Copy built app to root
 COPY build/libs/*.jar /app.jar

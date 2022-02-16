@@ -76,7 +76,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: latest
-          SERVICE_NAME: ${{ env.TESTING_SERVICE_NAME }}
+          SERVICE_NAME: dbowland/${{ env.TESTING_SERVICE_NAME }}
         run: |
           docker build -t "$ECR_REGISTRY/$SERVICE_NAME:$IMAGE_TAG" . --platform linux/amd64
           docker push "$ECR_REGISTRY/$SERVICE_NAME:$IMAGE_TAG"
@@ -133,7 +133,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: latest
-          SERVICE_NAME: ${{ env.TESTING_SERVICE_NAME }}
+          SERVICE_NAME: dbowland/${{ env.TESTING_SERVICE_NAME }}
         run: |
           docker build -t "$ECR_REGISTRY/$SERVICE_NAME:$IMAGE_TAG" . --platform linux/amd64
           docker push "$ECR_REGISTRY/$SERVICE_NAME:$IMAGE_TAG"
@@ -190,7 +190,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: latest
-          SERVICE_NAME: ${{ env.PROD_SERVICE_NAME }}
+          SERVICE_NAME: dbowland/${{ env.PROD_SERVICE_NAME }}
         run: |
           docker build -t "$ECR_REGISTRY/$SERVICE_NAME:$IMAGE_TAG" . --platform linux/amd64
           docker push "$ECR_REGISTRY/$SERVICE_NAME:$IMAGE_TAG"
