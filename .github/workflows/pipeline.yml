@@ -29,7 +29,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
-          distribution: 'adopt'
+          distribution: 'liberica'
       - name: Run code linter and run unit tests
         run: ./gradlew check --rerun-tasks
 
@@ -50,7 +50,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
-          distribution: 'adopt'
+          distribution: 'liberica'
       - name: Build project, which checks style and runs tests
         run: ./gradlew build --rerun-tasks
 
@@ -68,7 +68,7 @@ jobs:
             --region ${{ secrets.AWS_REGION }} \
             --no-fail-on-empty-changeset \
             --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides 'AccountId=${{ secrets.AWS_ACCOUNT_ID }} Environment=test'
+            --parameter-overrides 'Environment=test'
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
@@ -88,7 +88,7 @@ jobs:
             --region ${{ secrets.AWS_REGION }} \
             --no-fail-on-empty-changeset \
             --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides 'AccountId=${{ secrets.AWS_ACCOUNT_ID }} Environment=test'
+            --parameter-overrides 'Environment=test'
 
   deploy-testing:
     name: Deploy to test environment
@@ -107,7 +107,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
-          distribution: 'adopt'
+          distribution: 'liberica'
       - name: Build project, which checks style and runs tests
         run: ./gradlew build --rerun-tasks
 
@@ -125,7 +125,7 @@ jobs:
             --region ${{ secrets.AWS_REGION }} \
             --no-fail-on-empty-changeset \
             --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides 'AccountId=${{ secrets.AWS_ACCOUNT_ID }} Environment=test'
+            --parameter-overrides 'Environment=test'
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
@@ -145,7 +145,7 @@ jobs:
             --region ${{ secrets.AWS_REGION }} \
             --no-fail-on-empty-changeset \
             --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides 'AccountId=${{ secrets.AWS_ACCOUNT_ID }} Environment=test'
+            --parameter-overrides 'Environment=test'
 
   deploy-production:
     name: Deploy to production
@@ -164,7 +164,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
-          distribution: 'adopt'
+          distribution: 'liberica'
       - name: Build project, which checks style and runs tests
         run: ./gradlew build --rerun-tasks
 
@@ -181,8 +181,7 @@ jobs:
             --template-file ${{ env.TEMPLATE_NAME_ECR }} \
             --region ${{ secrets.AWS_REGION }} \
             --no-fail-on-empty-changeset \
-            --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides 'AccountId=${{ secrets.AWS_ACCOUNT_ID }}'
+            --capabilities CAPABILITY_NAMED_IAM
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
@@ -201,5 +200,4 @@ jobs:
             --template-file ${{ env.TEMPLATE_NAME }} \
             --region ${{ secrets.AWS_REGION }} \
             --no-fail-on-empty-changeset \
-            --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides 'AccountId=${{ secrets.AWS_ACCOUNT_ID }}'
+            --capabilities CAPABILITY_NAMED_IAM
