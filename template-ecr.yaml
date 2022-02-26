@@ -1,14 +1,11 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  emails-queue-service
+  ECR repository for java-template
 
 Transform:
   - AWS::Serverless-2016-10-31
 
 Parameters:
-  AccountId:
-    Type: String
-    Description: AWS account ID
   Environment:
     Type: String
     Default: prod

@@ -14,7 +14,7 @@ sam deploy --stack-name java-template-ecr-test \
   --capabilities CAPABILITY_NAMED_IAM \
   --template-file template-ecr.yaml \
   --no-fail-on-empty-changeset \
-  --parameter-overrides "AccountId=$AWS_ACCOUNT_ID Environment=test"
+  --parameter-overrides "Environment=test"
 
 ./scripts/uploadToEcr.sh
 
@@ -23,7 +23,7 @@ sam deploy --stack-name java-template-test \
   --capabilities CAPABILITY_NAMED_IAM \
   --template-file template.yaml \
   --no-fail-on-empty-changeset \
-  --parameter-overrides "AccountId=$AWS_ACCOUNT_ID Environment=test"
+  --parameter-overrides "Environment=test"
 
 # Force a redeploy of the service, assuming it already existed
 echo

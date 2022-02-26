@@ -1,14 +1,11 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  java-template
+  Groovy template running in ECS
 
 Transform:
   - AWS::Serverless-2016-10-31
 
 Parameters:
-  AccountId:
-    Type: String
-    Description: AWS account ID
   Environment:
     Type: String
     Default: prod
@@ -16,13 +13,6 @@ Parameters:
       - prod
       - test
     Description: Environment for deploy
-  Region:
-    Type: String
-    Default: us-east-2
-    AllowedValues:
-      - us-east-1
-      - us-east-2
-    Description: Region for deploy
   ContainerPort:
     Type: Number
     Default: 8000
@@ -117,7 +107,7 @@ Resources:
     Properties:
       ContainerDefinitions:
         - Image: !Sub
-            - '${AccountId}.dkr.ecr.us-east-2.amazonaws.com/dbowland/${Project}:latest'
+            - '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/dbowland/${Project}:latest'
             - Project: !FindInMap [EnvironmentMap, !Ref Environment, project]
           LogConfiguration:
             LogDriver: awslogs
@@ -209,7 +199,7 @@ Resources:
     Properties:
       Certificates:
         - CertificateArn: !Sub
-            - 'arn:aws:acm:${Region}:${AccountId}:certificate/${Certificate}'
+            - 'arn:aws:acm:${AWS::Region}:${AWS::AccountId}:certificate/${Certificate}'
             - Certificate: !FindInMap [ EnvironmentMap, !Ref Environment, certificate ]
       DefaultActions:
         - TargetGroupArn: !Ref TargetGroup
