@@ -34,6 +34,7 @@ Mappings:
     prod:
       certificate: 5d4db894-c9fc-42ca-8f80-3c5da6c1678e
       domain: java-template.dbowland.com
+      logStreamFunction: log-subscriber-LogGroupSubscriber-vVxMCBqXplyr
       project: java-template
       securityGroupContainer: sg-0e88abc4c682068c6
       securityGroupHttps: sg-00406c1b125fd4c55
@@ -44,6 +45,7 @@ Mappings:
     test:
       certificate: 14a32175-0c26-4768-b71f-3fa611b8f5a2
       domain: java-template.bowland.link
+      logStreamFunction: log-subscriber-test-LogGroupSubscriber-pAJMIulEeHur
       project: java-template-test
       securityGroupContainer: sg-04a70084c0a15ffe6
       securityGroupHttps: sg-09877169390ae3cc2
@@ -263,18 +265,14 @@ Resources:
         - Project: !FindInMap [EnvironmentMap, !Ref Environment, project]
       RetentionInDays: 30
 
-  ErrorMetricFilter:
-    Type: AWS::Logs::MetricFilter
-    DependsOn: [ClusterLogGroup]
+  ClusterLogGroupSubscription:
+    Type: AWS::Logs::SubscriptionFilter
     Properties:
-      FilterPattern: '[timestamp, uuid, level="ERROR", message]'
-      LogGroupName: !Sub
-        - '/aws/ecs/${Project}'
-        - Project: !FindInMap [EnvironmentMap, !Ref Environment, project]
-      MetricTransformations:
-        - MetricValue: '1'
-          MetricNamespace: dbowland
-          MetricName: ErrorCount
+      DestinationArn: !Sub
+        - 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Function}'
+        - Function: !FindInMap [EnvironmentMap, !Ref Environment, logStreamFunction]
+      FilterPattern: '{ $.level = "ERROR" }'
+      LogGroupName: !Ref ClusterLogGroup
 
   # Route 53
 
