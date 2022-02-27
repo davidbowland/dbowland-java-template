@@ -9,9 +9,13 @@ on:
 env:
   TEMPLATE_NAME: template.yaml
   TEMPLATE_NAME_ECR: template-ecr.yaml
+  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/dbowland-pipeline-test
+  TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/dbowland-cloudformation-test
   TESTING_SERVICE_NAME: java-template-test
   TESTING_STACK_NAME: java-template-test
   TESTING_STACK_NAME_ECR: java-template-ecr-test
+  PROD_PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/dbowland-pipeline
+  PROD_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/dbowland-cloudformation
   PROD_SERVICE_NAME: java-template
   PROD_STACK_NAME: java-template
   PROD_STACK_NAME_ECR: java-template-ecr
@@ -54,12 +58,16 @@ jobs:
       - name: Build project, which checks style and runs tests
         run: ./gradlew build --rerun-tasks
 
-      - name: Configure AWS credentials
+      - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: feature-deployment
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
       - name: Deploy test ECR infrastructure
         shell: bash
         run: |
@@ -68,6 +76,7 @@ jobs:
             --region ${{ secrets.AWS_REGION }} \
             --no-fail-on-empty-changeset \
             --capabilities CAPABILITY_NAMED_IAM \
+            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
             --parameter-overrides 'Environment=test'
       - name: Login to Amazon ECR
         id: login-ecr
@@ -88,6 +97,7 @@ jobs:
             --region ${{ secrets.AWS_REGION }} \
             --no-fail-on-empty-changeset \
             --capabilities CAPABILITY_NAMED_IAM \
+            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
             --parameter-overrides 'Environment=test'
 
   deploy-testing:
@@ -111,12 +121,16 @@ jobs:
       - name: Build project, which checks style and runs tests
         run: ./gradlew build --rerun-tasks
 
-      - name: Configure AWS credentials
+      - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: testing-deployment
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
       - name: Deploy test ECR infrastructure
         shell: bash
         run: |
@@ -125,6 +139,7 @@ jobs:
             --region ${{ secrets.AWS_REGION }} \
             --no-fail-on-empty-changeset \
             --capabilities CAPABILITY_NAMED_IAM \
+            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
             --parameter-overrides 'Environment=test'
       - name: Login to Amazon ECR
         id: login-ecr
@@ -145,6 +160,7 @@ jobs:
             --region ${{ secrets.AWS_REGION }} \
             --no-fail-on-empty-changeset \
             --capabilities CAPABILITY_NAMED_IAM \
+            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
             --parameter-overrides 'Environment=test'
 
   deploy-production:
@@ -168,12 +184,16 @@ jobs:
       - name: Build project, which checks style and runs tests
         run: ./gradlew build --rerun-tasks
 
-      - name: Configure AWS credentials
+      - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ env.PROD_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: prod-deployment
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
       - name: Deploy production ECR infrastructure
         shell: bash
         run: |
@@ -181,7 +201,8 @@ jobs:
             --template-file ${{ env.TEMPLATE_NAME_ECR }} \
             --region ${{ secrets.AWS_REGION }} \
             --no-fail-on-empty-changeset \
-            --capabilities CAPABILITY_NAMED_IAM
+            --capabilities CAPABILITY_NAMED_IAM \
+            --role-arn ${PROD_CLOUDFORMATION_EXECUTION_ROLE}
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
@@ -200,4 +221,5 @@ jobs:
             --template-file ${{ env.TEMPLATE_NAME }} \
             --region ${{ secrets.AWS_REGION }} \
             --no-fail-on-empty-changeset \
-            --capabilities CAPABILITY_NAMED_IAM
+            --capabilities CAPABILITY_NAMED_IAM \
+            --role-arn ${PROD_CLOUDFORMATION_EXECUTION_ROLE}
